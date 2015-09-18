@@ -5,7 +5,7 @@
 #property strict
 input int magic_num=2015; //Magic Number
 input string time_open_str="14:00"; // Trading Window Start Time (GMT)
-input string time_close_str="21:00"; // Trading Window End Time (GMT)
+input string time_close_str="-1"; // Trading Window End Time (GMT, -1 disable)
 input int max_trades=0;//Max Trades per Trading Slot (0 unlimited)
 input int max_cycles=0;//Max Cycles per Trading Slot (0 unlimited)
 input int qde=325;//Quantum eintDepth3 for Entry
@@ -31,6 +31,7 @@ datetime day_curr;
 datetime day_prev; 
 int bars = Bars;
 int trend_bias = -1;
+bool useCloseTime = time_close_str != "-1";
 
 int init()
 {
@@ -46,7 +47,12 @@ int start()
 {
    datetime currTime = TimeGMT();
    datetime time_open = StrToTime(time_open_str);
-   datetime time_close = StrToTime(time_close_str);
+   datetime time_close = NULL; 
+   
+   if (useCloseTime) {
+      time_close = StrToTime(time_close_str);
+   }
+   
    bool barNext = false;
    
    day_curr=iTime(Symbol(),PERIOD_D1,0);
@@ -73,7 +79,7 @@ int start()
       //Print("Trend Bias ",trend_bias);
    }
 
-   if ((cycles < max_cycles || max_cycles == 0) && (trades < max_trades || max_trades == 0) && currTime >= time_open && currTime < time_close && barNext)
+   if ((cycles < max_cycles || max_cycles == 0) && (trades < max_trades || max_trades == 0) && currTime >= time_open && (!useCloseTime || currTime < time_close) && barNext)
    {
       int nextTicket = -1;
       bool trade = false;
