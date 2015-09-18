@@ -79,7 +79,11 @@ int start()
       //Print("Trend Bias ",trend_bias);
    }
 
-   if ((cycles < max_cycles || max_cycles == 0) && (trades < max_trades || max_trades == 0) && currTime >= time_open && (!useCloseTime || currTime < time_close) && barNext)
+   if ((cycles < max_cycles || max_cycles == 0) && 
+         (trades < max_trades || max_trades == 0) && 
+         ((!useCloseTime && trades > 0) || currTime >= time_open) && 
+         (!useCloseTime || currTime < time_close) && 
+         barNext)
    {
       int nextTicket = -1;
       bool trade = false;
